@@ -1,0 +1,12 @@
+{
+  "name": "hp100-remote",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "lodash": "^4.17.20",
+    "socket.io": "^3.0.3",
+    "superagent": "^6.1.0"
+  }
+}
