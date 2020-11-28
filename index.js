@@ -25,13 +25,12 @@ io.on("connection", async(socket) => {
 
   // Fetch data
   let data = await fetchData()
-
-  socket.broadcast.emit('measurement', data); // Send Measurements
+  io.sockets.emit('measurement', data); // Send Measurements
 
   setInterval(async () => {
     if (Object.keys(users).length) {
       data = await fetchData()
-      socket.broadcast.emit('measurement', data);
+      io.sockets.emit('measurement', data);
     }
   }, 1000 * 60);
 
@@ -43,6 +42,7 @@ io.on("connection", async(socket) => {
 
 
 async function fetchData() {
+  return {}
   try {
     const res = await request("https://www.airvisual.com/api/v3/node/5e09686cff5ce29bfeb6f955").retry(3).timeout(10000);
     const body = res.body || {};
