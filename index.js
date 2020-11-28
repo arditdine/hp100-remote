@@ -1,9 +1,9 @@
 const express = require("express");
-const { retry } = require("statuses");
 const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 const request = require("superagent");
+const _ = require('lodash')
 const aqiCalculator = require('./lib')
 
 app.use(express.static('assets'))
@@ -43,10 +43,31 @@ io.on("connection", async(socket) => {
 
 async function fetchData() {
   try {
-    const res = await request("https://www.airvisual.com/api/v3/node/5e09686cff5ce29bfeb6f955").retry(3).timeout(10000);
+    const res = await request("https://app-api.airvisual.com/api/v5/devices/t1ll5umj")
+      .set({'x-api-token': 'Hu/FAo/FejEFaG2utqqqWYEJTYk1/kkOh9XhF4I1sD8='})
+      .retry(3)
+      .timeout(10000);
     const body = res.body || {};
-    const { label } = aqiCalculator(body.current_measurement.p2.conc)
-    return {...body.current_measurement, label};
+
+    const data = {
+      aqius: _.get(body, 'data.currentMeasurement.aqius'),
+      tp: _.get(body, 'data.currentWeather.temperature'),
+      hm: _.get(body, 'data.currentWeather.humidity'),
+      ts: _.get(body, 'data.currentMeasurement.ts')
+    }
+
+    const pollutants = _.get(body, 'data.currentMeasurement.pollutants', [])
+
+    pollutants.forEach(el => {
+      if(el.pollutant === "pm25") {
+        const { label } = aqiCalculator(el.conc)
+        data.label = label
+      }
+    })
+
+    console.log(data)
+
+    return data;
   } catch (ex) {
     console.error("ERROR_FETCHING_DATA", ex.message);
     return {};
