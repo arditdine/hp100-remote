@@ -42,7 +42,6 @@ io.on("connection", async(socket) => {
 
 
 async function fetchData() {
-  return {}
   try {
     const res = await request("https://www.airvisual.com/api/v3/node/5e09686cff5ce29bfeb6f955").retry(3).timeout(10000);
     const body = res.body || {};
