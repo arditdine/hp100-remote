@@ -19,7 +19,7 @@ app.get("/index.html", (req, res) => {
 const users = {};
 
 io.on("connection", async(socket) => {
-  console.log("a user connected");
+  // console.log("a user connected");
 
   users[socket.id] = socket;
 
@@ -33,6 +33,11 @@ io.on("connection", async(socket) => {
       io.sockets.emit('measurement', data);
     }
   }, 1000 * 60);
+
+
+  socket.on('command', (data) => {
+    io.sockets.emit('command', data);
+  })
 
   socket.on("disconnect", () => {
     delete users[socket.id]
@@ -64,8 +69,6 @@ async function fetchData() {
         data.label = label
       }
     })
-
-    console.log(data)
 
     return data;
   } catch (ex) {

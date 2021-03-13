@@ -19,7 +19,6 @@
     <link rel="shortcut icon" href="/favicons/favicon.ico?v=2">
 
     <title>My IoT Remote</title>
-    <link rel="dns-prefetch" href="https://cloud-api.dev.iqair.io">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.9.95/css/materialdesignicons.min.css">
     <link rel="manifest" href="/manifest.json">
@@ -249,6 +248,18 @@
 
 
         });
+
+        var defaultSpeedValue = 0
+        $("#slider-ctn").bind( "change", function(event, ui) {
+            if(event.target.value !== defaultSpeedValue) {
+                defaultSpeedValue = event.target.value
+                socket.emit("command", {speed: defaultSpeedValue})
+            }
+        });
+
+        $("#setPowerBtn").on("click", function() {
+            socket.emit("command", {off: true})
+        })
 
     </script>
 
