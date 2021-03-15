@@ -21,6 +21,9 @@ const users = {};
 io.on("connection", async(socket) => {
   // console.log("a user connected");
 
+  // For Every new connection we get the Purifier Status
+  io.sockets.emit('askPurifierStatus')
+
   users[socket.id] = socket;
 
   // Fetch data
@@ -37,6 +40,14 @@ io.on("connection", async(socket) => {
 
   socket.on('command', (data) => {
     io.sockets.emit('command', data);
+  })
+
+  socket.on('askPurifierStatus', () => {
+    io.sockets.emit('askPurifierStatus')
+  })
+
+  socket.on('purfierStatus', data => {
+    io.sockets.emit('purfierStatus', data)
   })
 
   socket.on("disconnect", () => {
