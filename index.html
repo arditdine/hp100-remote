@@ -57,7 +57,7 @@
 
             <div class="field fanSpeed">
                 <div id="slider-ctn" class="control has-icons-left">
-                    <input type="range" name="slider-fill" id="slider-fill" value="1" min="1" max="6" data-highlight="true" data-popup-enabled="true">
+                    <input class="input slider is-fullwidth is-large" value="1" min="1" max="6" type="range">
                     <span class="icon">
                         <i class="mdi mdi-fan mdi-dark mdi-24px"></i>
                     </span>
@@ -181,38 +181,130 @@
                 text-align: left;
             }
 
+            .input {
+                border-color: transparent;
+                box-shadow: none;
+            }
+
+            input[type=range] {
+            -webkit-appearance: none;
+            margin: 10px 0;
+            width: 100%;
+            }
+            input[type=range]:focus {
+            outline: none;
+            }
+            input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            animate: 0.2s;
+            box-shadow: 0px 0px 0px #000000;
+            background: #E9E9E9;
+            border-radius: 5px;
+            border: 0px solid #000000;
+            }
+            input[type=range]::-webkit-slider-thumb {
+            box-shadow: 0px 0px 0px #000000;
+            border: 1px solid #BABABA;
+            height: 20px;
+            width: 20px;
+            border-radius: 5px;
+            background: #FFFFFF;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -5.5px;
+            }
+            input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #E9E9E9;
+            }
+            input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            animate: 0.2s;
+            box-shadow: 0px 0px 0px #000000;
+            background: #E9E9E9;
+            border-radius: 5px;
+            border: 0px solid #000000;
+            }
+            input[type=range]::-moz-range-thumb {
+            box-shadow: 0px 0px 0px #000000;
+            border: 1px solid #BABABA;
+            height: 20px;
+            width: 20px;
+            border-radius: 5px;
+            background: #FFFFFF;
+            cursor: pointer;
+            }
+            input[type=range]::-ms-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            animate: 0.2s;
+            background: transparent;
+            border-color: transparent;
+            color: transparent;
+            }
+            input[type=range]::-ms-fill-lower {
+            background: #E9E9E9;
+            border: 0px solid #000000;
+            border-radius: 10px;
+            box-shadow: 0px 0px 0px #000000;
+            }
+            input[type=range]::-ms-fill-upper {
+            background: #E9E9E9;
+            border: 0px solid #000000;
+            border-radius: 10px;
+            box-shadow: 0px 0px 0px #000000;
+            }
+            input[type=range]::-ms-thumb {
+            margin-top: 1px;
+            box-shadow: 0px 0px 0px #000000;
+            border: 1px solid #BABABA;
+            height: 20px;
+            width: 20px;
+            border-radius: 5px;
+            background: #FFFFFF;
+            cursor: pointer;
+            }
+            input[type=range]:focus::-ms-fill-lower {
+            background: #E9E9E9;
+            }
+            input[type=range]:focus::-ms-fill-upper {
+            background: #E9E9E9;
+            }
+
         </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@1.11.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-mobile@1.4.1/dist/jquery.mobile.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
         particlesJS('particles', {"particles":{"number":{"value":80,"density":{"enable":true,"value_area":800}},"color":{"value":"#ffffff"},"shape":{"type":"circle","stroke":{"width":0,"color":"#000000"},"polygon":{"nb_sides":5},"image":{"src":"img\/github.svg","width":100,"height":100}},"opacity":{"value":0.5,"random":false,"anim":{"enable":false,"speed":1,"opacity_min":0.1,"sync":false}},"size":{"value":3,"random":true,"anim":{"enable":false,"speed":40,"size_min":0.1,"sync":false}},"line_linked":{"enable":false,"distance":150,"color":"#ffffff","opacity":0.4,"width":1},"move":{"enable":true,"speed":6,"direction":"none","random":false,"straight":false,"out_mode":"out","bounce":false,"attract":{"enable":false,"rotateX":600,"rotateY":1200}}},"interactivity":{"detect_on":"canvas","events":{"onhover":{"enable":false,"mode":"repulse"},"onclick":{"enable":false,"mode":"push"},"resize":true},"modes":{"grab":{"distance":400,"line_linked":{"opacity":1}},"bubble":{"distance":400,"size":40,"duration":2,"opacity":8,"speed":3},"repulse":{"distance":200,"duration":0.4},"push":{"particles_nb":4},"remove":{"particles_nb":2}}},"retina_detect":true});
-        
+    
         var autoModeButton = $("#setAutoBtn");
         var powerButton = $("#setPowerBtn");
         var purfierMode = 'manual';
+        var defaultSpeedValue = 0
 
         var socket = io();
 
         socket.on('purfierStatus', function(data){
             var slider = $("#slider-ctn input");
-            purfierMode = data.mode;
 
             if(data.speed !== parseInt(slider.val())) {
-                slider.val(data.speed).slider('refresh')
+                slider.val(data.speed)
             }
 
             if(data.mode === 'auto'){
-                slider.prop('disabled', true).slider('refresh');
+                slider.prop('disabled', true);
             }
             if(data.mode === 'manual') {
-                slider.prop('disabled', false).slider('refresh');
+                slider.prop('disabled', false);
             }
             
-
-
+            purfierMode = data.mode;
             powerButton.css("color", data.status ? 'red' : 'gray');
             autoModeButton.css("color", data.mode === 'auto' ? 'green' : 'gray')
         })
@@ -243,12 +335,9 @@
 
         });
 
-        var defaultSpeedValue = 0
-        $("#slider-ctn").bind( "change", function(event, ui) {
-            if(event.target.value !== defaultSpeedValue) {
-                defaultSpeedValue = event.target.value
-                socket.emit("command", {speed: defaultSpeedValue})
-            }
+        $("#slider-ctn").bind("change", function(e) {
+            defaultSpeedValue = e.target.value
+            socket.emit("command", { speed: defaultSpeedValue })
         });
 
         powerButton.on("click", function() {
