@@ -285,7 +285,8 @@
     
         var autoModeButton = $("#setAutoBtn");
         var powerButton = $("#setPowerBtn");
-        var purfierMode = 'manual';
+        var purifierMode = 'manual';
+        var purifierStatus = 0
         var defaultSpeedValue = 0
 
         var socket = io();
@@ -304,7 +305,8 @@
                 slider.prop('disabled', false);
             }
             
-            purfierMode = data.mode;
+            purifierMode = data.mode;
+            purifierStatus = data.status;
             powerButton.css("color", data.status ? 'red' : 'gray');
             autoModeButton.css("color", data.mode === 'auto' ? 'green' : 'gray')
         })
@@ -341,13 +343,13 @@
         });
 
         powerButton.on("click", function() {
-            socket.emit("command", { off: true })
-            powerButton.css("color", "gray")
+            socket.emit("command", { off: purifierStatus, on: !purifierStatus })
+            powerButton.css("color", purifierStatus ? 'red' : 'gray')
         })
 
         autoModeButton.on("click", function() {
-            socket.emit("command", { mode: purfierMode == 'auto' ? 'manual' : 'auto' })
-            autoModeButton.css("color", purfierMode == 'auto' ? 'green': 'gray')
+            socket.emit("command", { mode: purifierMode == 'auto' ? 'manual' : 'auto' })
+            autoModeButton.css("color", purifierMode == 'auto' ? 'green': 'gray')
         })
 
     </script>
