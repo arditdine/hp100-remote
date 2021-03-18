@@ -6,15 +6,14 @@ const request = require("superagent");
 const _ = require('lodash')
 const aqiCalculator = require('./lib')
 
+const AVP_URL = process.env.AVP_URL
+const USER_TOKEN = process.env.USER_TOKEN
+const PORT = process.env.PORT || 8001
+
 app.use(express.static('assets'))
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
-});
-
-app.get("/index.html", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
-});
+app.get("/", (req, res) =>  res.sendFile(__dirname + "/index.html"));
+app.get("/index.html", (req, res) => res.sendFile(__dirname + "/index.html"));
 
 const users = {};
 
@@ -38,17 +37,9 @@ io.on("connection", async(socket) => {
   }, 1000 * 60);
 
 
-  socket.on('command', (data) => {
-    io.sockets.emit('command', data);
-  })
-
-  socket.on('askPurifierStatus', () => {
-    io.sockets.emit('askPurifierStatus')
-  })
-
-  socket.on('purfierStatus', data => {
-    io.sockets.emit('purfierStatus', data)
-  })
+  socket.on('command', data => io.sockets.emit('command', data))
+  socket.on('askPurifierStatus', () => io.sockets.emit('askPurifierStatus'))
+  socket.on('purfierStatus', data => io.sockets.emit('purfierStatus', data))
 
   socket.on("disconnect", () => {
     delete users[socket.id]
@@ -59,10 +50,7 @@ io.on("connection", async(socket) => {
 
 async function fetchData() {
   try {
-    const res = await request("https://app-api.airvisual.com/api/v5/devices/t1ll5umj")
-      .set({'x-api-token': 'Hu/FAo/FejEFaG2utqqqWYEJTYk1/kkOh9XhF4I1sD8='})
-      .retry(3)
-      .timeout(10000);
+    const res = await request(AVP_URL).set({'x-api-token': USER_TOKEN}).retry(3).timeout(10000);
     const body = res.body || {};
 
     const data = {
@@ -88,4 +76,4 @@ async function fetchData() {
   }
 }
 
-http.listen(8001, () => console.log("listening on *:8001"));
+http.listen(PORT, () => console.log(`listening on *:${PORT}`));
