@@ -9,8 +9,6 @@ const { MongoClient, ObjectId } = require("mongodb");
 let client = null;
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017'
 
-const PORT = process.env.PORT || 8001
-
 app.use(express.static('assets'))
 app.get("/device", (req, res) =>  res.sendFile(__dirname + "/index.html"));
 app.get("/tv", (req, res) =>  res.sendFile(__dirname + "/tv.html"));
@@ -82,4 +80,5 @@ function etlData(data = {}) {
   return res;
 }
 
+const PORT = process.env.PORT || 8080
 http.listen(PORT, () => console.log(`listening on *:${PORT}`));
