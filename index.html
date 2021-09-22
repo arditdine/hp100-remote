@@ -85,7 +85,8 @@
     var socket = io({
         query: {
             model: getQueryStringValue("model"),
-            device_id: getQueryStringValue("device_id")
+            device_id: getQueryStringValue("device_id"),
+            token: getQueryStringValue("token")
         }
     });
 

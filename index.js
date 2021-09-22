@@ -15,18 +15,33 @@ app.get("/device", (req, res) =>  res.sendFile(__dirname + "/index.html"));
 const users = {};
 const DB_MODEL_MAP = { avp: 'device_info', avo: 'avo_device_info' }
 
+io.use(async (socket, next) => {
+  const token = socket.handshake.query.token
+  if(!token) return next(new Error('No token provided'))
+
+  if(!client) client = await MongoClient.connect(MONGO_URL, { useNewUrlParser: true });
+  const user = await client.db('airvisual').collection('users').findOne({'services.resume.loginTokens.hashedToken': token}, { _id: 1 })
+  if(!user) return next(new Error('Invalid token'))
+  socket.user = user._id
+  next()
+})
+
 io.on("connection", async(socket) => {
-  const { model, device_id } = socket.handshake.query || {}
-  
   if(!client) client = await MongoClient.connect(MONGO_URL, { useNewUrlParser: true });
 
-  console.log(`Connected: ${model}_${device_id} ${socket.id}`)
+  const { model, device_id } = socket.handshake.query || {}
+
+  if(!model || !device_id) return new Error('Parameters missing')
+
+  // Get current measurements and later listen for changes only
+  const device = await client.db("airvisual").collection(DB_MODEL_MAP[model]).findOne({ _id: model !== 'avp' ? ObjectId(device_id) : device_id, owner: socket.user })
+  if(!device)  return new Error('No device found for this owner')
+
+  console.log(`Connected: ${model}_${device_id} ${socket.id} ${socket.user}`)
 
   users[`${model}_${device_id}`] = [...(users[`${model}_${device_id}`] || []), socket]
 
-  // Get current measurements and later listen for changes only
-  const current = await client.db("airvisual").collection(DB_MODEL_MAP[model]).findOne({ _id: model !== 'avp' ? ObjectId(device_id) : device_id })
-  socket.emit('measurement', etlData(current)); // Send Measurements
+  socket.emit('measurement', etlData(device)); // Send Measurements
 
   // Listen to changes and if any send new measurements
   const avpStream = client.db("airvisual").collection("device_info").watch([]);
