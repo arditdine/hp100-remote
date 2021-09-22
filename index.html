@@ -1,376 +1,169 @@
-
 <!DOCTYPE html>
-<html class="has-navbar-fixed-bottom">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="HandheldFriendly" content="true">
-    <meta name="MobileOptimized" content="width">
-    <meta name="theme-color" content="#f9f9f9">
+<html>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
-    <link rel="mask-icon" href="/favicons/safari-pinned-tab.svg" color="#d9272e">
-    <link rel="shortcut icon" href="/favicons/favicon.ico?v=2">
+<head>
+  <title>TV Screen</title>
+  <link rel="icon shortcut" href="https://www.iqair.com/dashboard/device/tv/favicon.a3fff058.ico">
+  <link rel="stylesheet" href="/style.css">
+</head>
 
-    <title>My IoT Remote</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@4.9.95/css/materialdesignicons.min.css">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-mobile@1.4.1/dist/jquery.mobile.min.css" />
+<body>
 
-  </head>
-  <body>
-    <div id="particles"></div>
-  <section id="heroSection" class="hero is-fullheight">
-      <div class="hero-head">
-          <div class="container has-text-centered">
-              <div class="columns is-mobile" style="padding: 1em;">
-                  <div class="column">
-                    <span class="title">Home</span>
-                  </div>
-              </div>
+  <div class="bg">
+    <div class="container">
+      <div class="header">
+        <div class="space">
+          <div class="space-name">
+            <h1 id="device-name"></h1>
+          </div>
         </div>
-    </div>
-      <div class="hero-body" style="margin-top:-10em;">
-          <div class="container has-text-centered">
-            <p id="aqiValue" class="title is-size-1">Offline</p>
-            <p id="aqiMsg" class="subtitle is-size-5"><span class="is-size-1 loader" style="margin: 0 auto; border-left-color:#4a4a4a; border-bottom-color:#4a4a4a"></span></p>
-            <p class="subtitle is-size-6">
-                <span class="icon is-medium"><i class="mdi mdi-weather-sunny mdi-24px"></i></span>
-                <span id="temperature" style="font-size: 24px;"> - </span>
-                <span class="icon is-medium"><i class="mdi mdi-water-percent mdi-24px"></i></span>
-                <span id="humidity" style="font-size: 24px;"> - </span>
-            </p>
-            <p id="lastMeasurementAt" class="subtitle is-size-7"></p>
+        <div class="forecast">
+          <div class="forecast-datetime"> <span class="time" id="clock">00:00:00</span> <span class="date" id="date"></span> </div>
+          <div class="forecast-icon active" id="weather-container"> <img alt="" class="weather-icon" id="weather-icon" src="https://www.iqair.com/assets/weather/ic-w-01-clear-sky-full.svg"> </div>
         </div>
       </div>
-    </section>
-    <section>
-        <div class="container">
-        <nav class="navbar is-fixed-bottom is-block">
-
-            <div class="field fanSpeed">
-                <div id="slider-ctn" class="control has-icons-left">
-                    <input class="input slider is-fullwidth is-large" value="1" min="1" max="6" type="range">
-                    <span class="icon">
-                        <i class="mdi mdi-fan mdi-dark mdi-24px"></i>
-                    </span>
-                </div>
+      <div class="main" id="content-container">
+        <div class="aqi">
+          <div class="aqi-card green">
+            <div class="label-face">
+              <span class="aqi-label">Air quality</span>
+              <img src="https://www.iqair.com/dashboard/device/tv/img/ic-face-green-96-px.svg" alt="" class="aqi-face face-icon">
             </div>
-
-            <div class="field remoteSensor">
-                <!--  has-icons-right is-loading -->
-                <div class="control is-small has-icons-left">
-                    <input id="setRemoteSensorVal" class="input is-small" type="number" min="0" max="2000" placeholder="Remote Sensor PM2.5 concentration">
-                    <span class="icon is-small is-left" style="height: 32px;">
-                        <i class="mdi mdi-remote"></i>
-                    </span>
-                </div>
+            <div>
+              <div class="aqi-status"></div>
+              <div><span class="aqi-number"></span></div>
             </div>
-
-            <div class="field is-grouped is-grouped-centered" style="margin-top:2em;padding-bottom:1em;">
-            <div class="columns is-mobile">
-                <div class="column">
-                    <p class="control">
-                        <a id="setPowerBtn" class="button is-rounded ">
-                            <span class="icon is-large"><i class="mdi mdi-power mdi-36px"></i></span>
-                        </a>
-                    </p>
-                </div>
-
-                <div class="column">
-                    <p class="control">
-                        <a id="setAutoBtn" class="button is-rounded ui-link" style="color: gray;">AUTO</a>
-                    </p>
-                </div>
+          </div>
+          <div class="aqi-graph">
+            <div id="aqi-chart" data-highcharts-chart="3" style="overflow: hidden;">
+              <div id="highcharts-o5arbyy-141" dir="ltr" class="highcharts-container " style="position: relative; overflow: hidden; width: 234px; height: 77px; text-align: left; line-height: normal; z-index: 0; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); user-select: none;">
+              </div>
             </div>
-
+          </div>
         </div>
-    </nav>
+        <div class="info">
+          <div class="indoor">
+            <div class="pollutant">
+              
+            </div>
+            <div class="gauge"></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer"> <span class="latest-update">Last update <span id="lastUpdate"></span></span> <span
+          class="powered-by">Powered by <a href="/"><img src="https://www.iqair.com/dashboard/device/tv/ic-logo-iq-air-white.7267dbca.svg" alt="IQ Air logo"
+              class="footer-logo"></a> </span> </div>
     </div>
-</section>
-        <style>
-            .field.remoteSensor {
-                display: none;
-                max-width:300px;
-                margin: 0 auto;
-            }
-            .field.fanSpeed {
-                display: none;
-                max-width: 800px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-            #setLightBtn {
-                display: none;
-            }
-            #setAutoBtn{
-                color: gray;
-            }
-            #setPowerBtn{
-                color: gray;
-            }
-            #slider-fill {
-                display: none;
-            }
-            .ui-slider .ui-slider-track {
-                margin: 6px 34px 0 55px;
-            }
-            .hero-body .title {
-                font-size: 10em;
-            }
-            nav.navbar.is-fixed-bottom {
-                /* padding: 1em 0 2em 0; */
-                padding-top: 1em;
-            }
-            #particles {
-                position: absolute;
-                width: 100%;
-                height: 90%;
-            }
-            .hero.is-warning,
-            .hero.is-aqi-unhealthy-for-sg,
-            .hero.is-aqi-very-unhealthy,
-            .hero.is-aqi-hazardous,
-            .subtitle.is-size-6,
-            .subtitle.is-size-7,
-            #network-dropdown-menu .message-header {
-                text-shadow: none;
-            }
-
-            .is-aqi-good {
-                background-color: #a8e05f;
-                color: #718b3a;
-            }
-            .is-aqi-moderate {
-                background-color: #fdd74b;
-                color: #a57f23;
-            }
-            .is-aqi-unhealthy-for-sg {
-                /* background-color: #fe9b57; */
-                background-color: #ffa968;
-                color: #b25826;
-            }
-            .is-aqi-unhealthy {
-                background-color: #fe6a69;
-                /* background-color: #ff7978; */
-                color: #af2c3b;
-            }
-            .is-aqi-very-unhealthy {
-                background-color: #a97abc;
-                color: #634675;
-            }
-            .is-aqi-hazardous {
-                background-color: #a87383;
-                color: #683e51;
-            }
-
-            #network-dropdown-menu {
-                min-width: 15rem;
-            }
-            #network-dropdown-menu .dropdown-content, #network-dropdown-menu .dropdown-item {
-                padding: 0;
-            }
-            #network-dropdown-menu .message-body {
-                text-align: left;
-            }
-
-            .input {
-                border-color: transparent;
-                box-shadow: none;
-            }
-
-            input[type=range] {
-            -webkit-appearance: none;
-            margin: 10px 0;
-            width: 100%;
-            }
-            input[type=range]:focus {
-            outline: none;
-            }
-            input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 10px;
-            cursor: pointer;
-            animate: 0.2s;
-            box-shadow: 0px 0px 0px #000000;
-            background: #E9E9E9;
-            border-radius: 5px;
-            border: 0px solid #000000;
-            }
-            input[type=range]::-webkit-slider-thumb {
-            box-shadow: 0px 0px 0px #000000;
-            border: 1px solid #BABABA;
-            height: 20px;
-            width: 20px;
-            border-radius: 5px;
-            background: #FFFFFF;
-            cursor: pointer;
-            -webkit-appearance: none;
-            margin-top: -5.5px;
-            }
-            input[type=range]:focus::-webkit-slider-runnable-track {
-            background: #E9E9E9;
-            }
-            input[type=range]::-moz-range-track {
-            width: 100%;
-            height: 10px;
-            cursor: pointer;
-            animate: 0.2s;
-            box-shadow: 0px 0px 0px #000000;
-            background: #E9E9E9;
-            border-radius: 5px;
-            border: 0px solid #000000;
-            }
-            input[type=range]::-moz-range-thumb {
-            box-shadow: 0px 0px 0px #000000;
-            border: 1px solid #BABABA;
-            height: 20px;
-            width: 20px;
-            border-radius: 5px;
-            background: #FFFFFF;
-            cursor: pointer;
-            }
-            input[type=range]::-ms-track {
-            width: 100%;
-            height: 10px;
-            cursor: pointer;
-            animate: 0.2s;
-            background: transparent;
-            border-color: transparent;
-            color: transparent;
-            }
-            input[type=range]::-ms-fill-lower {
-            background: #E9E9E9;
-            border: 0px solid #000000;
-            border-radius: 10px;
-            box-shadow: 0px 0px 0px #000000;
-            }
-            input[type=range]::-ms-fill-upper {
-            background: #E9E9E9;
-            border: 0px solid #000000;
-            border-radius: 10px;
-            box-shadow: 0px 0px 0px #000000;
-            }
-            input[type=range]::-ms-thumb {
-            margin-top: 1px;
-            box-shadow: 0px 0px 0px #000000;
-            border: 1px solid #BABABA;
-            height: 20px;
-            width: 20px;
-            border-radius: 5px;
-            background: #FFFFFF;
-            cursor: pointer;
-            }
-            input[type=range]:focus::-ms-fill-lower {
-            background: #E9E9E9;
-            }
-            input[type=range]:focus::-ms-fill-upper {
-            background: #E9E9E9;
-            }
-
-        </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        particlesJS('particles', {"particles":{"number":{"value":80,"density":{"enable":true,"value_area":800}},"color":{"value":"#ffffff"},"shape":{"type":"circle","stroke":{"width":0,"color":"#000000"},"polygon":{"nb_sides":5},"image":{"src":"img\/github.svg","width":100,"height":100}},"opacity":{"value":0.5,"random":false,"anim":{"enable":false,"speed":1,"opacity_min":0.1,"sync":false}},"size":{"value":3,"random":true,"anim":{"enable":false,"speed":40,"size_min":0.1,"sync":false}},"line_linked":{"enable":false,"distance":150,"color":"#ffffff","opacity":0.4,"width":1},"move":{"enable":true,"speed":6,"direction":"none","random":false,"straight":false,"out_mode":"out","bounce":false,"attract":{"enable":false,"rotateX":600,"rotateY":1200}}},"interactivity":{"detect_on":"canvas","events":{"onhover":{"enable":false,"mode":"repulse"},"onclick":{"enable":false,"mode":"push"},"resize":true},"modes":{"grab":{"distance":400,"line_linked":{"opacity":1}},"bubble":{"distance":400,"size":40,"duration":2,"opacity":8,"speed":3},"repulse":{"distance":200,"duration":0.4},"push":{"particles_nb":4},"remove":{"particles_nb":2}}},"retina_detect":true});
-    
-        var getQueryStringValue = function(parameter) {
-            var currentPageURL = window.location.search.substring(1);
-            var queryString = currentPageURL.split('&');
-            var getParameter;
-            var i;
-            for (i = 0; i < queryString.length; i++) {
-                getParameter = queryString[i].split('=');
-                if (getParameter[0] === parameter) {
-                    return getParameter[1] === undefined ? true : decodeURIComponent(getParameter[1]);
-                }
-            }
-        };
+  </div>
 
 
-        var autoModeButton = $("#setAutoBtn");
-        var powerButton = $("#setPowerBtn");
-        var purifierMode = 'manual';
-        var purifierStatus = 0
-        var defaultSpeedValue = 0
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+      const clock = function() {
+        let getDate = new Date();
+        document.getElementById('clock').innerHTML = getDate.toLocaleTimeString('en-US', { hour12: false });
+    }
+    setInterval(function() { clock();}, 1000);
 
-        var socket = io({
-            query: {
-                model: getQueryStringValue("model"),
-                device_id: getQueryStringValue("device_id")
+    $("#date").text(moment().format('dddd, MMMM D'));
+
+    var getQueryStringValue = function(parameter) {
+        var currentPageURL = window.location.search.substring(1);
+        var queryString = currentPageURL.split('&');
+        var getParameter;
+        var i;
+        for (i = 0; i < queryString.length; i++) {
+            getParameter = queryString[i].split('=');
+            if (getParameter[0] === parameter) {
+                return getParameter[1] === undefined ? true : decodeURIComponent(getParameter[1]);
             }
-        });
+        }
+    };
 
-        socket.on('purfierStatus', function(data){
-            var slider = $("#slider-ctn input");
+    var socket = io({
+        query: {
+            model: getQueryStringValue("model"),
+            device_id: getQueryStringValue("device_id")
+        }
+    });
 
-            if(data.speed !== parseInt(slider.val())) {
-                slider.val(data.speed)
-            }
+    socket.on('measurement', function(msg){
 
-            if(data.mode === 'auto'){
-                slider.prop('disabled', true);
-            }
-            if(data.mode === 'manual') {
-                slider.prop('disabled', false);
-            }
-            
-            purifierMode = data.mode;
-            purifierStatus = data.status;
-            powerButton.css("color", data.status ? 'red' : 'gray');
-            autoModeButton.css("color", data.mode === 'auto' ? 'green' : 'gray')
-        })
+        $('.pollutant').empty()
 
-        socket.on('measurement', function(msg){
-            $("#aqiValue").removeClass("is-size-1")
-            $("#heroSection").addClass("is-success")
-            $(".fanSpeed").css('display', 'block')
-            
-
-            $("#aqiValue").html(msg.aqius)
-            $("#aqiMsg").html(msg.label)
-            $("#temperature").text(msg.tp)
-            $("#humidity").text(msg.hm)
-            $("#lastMeasurementAt").html(msg.ts)
-
-            if(msg.label === "Moderate")
-                $("#heroSection").removeClass().addClass('hero is-fullheight is-aqi-moderate')
-            if(msg.label === "Unhealthy")
-                $("#heroSection").removeClass().addClass('hero is-fullheight is-aqi-unhealthy')
-            if(msg.label === "Unhealthy For Sensitive Group")
-                $("#heroSection").removeClass().addClass('hero is-fullheight is-aqi-unhealthy-for-sg')
-            if(msg.label === "Very Unhealthy")
-                $("#heroSection").removeClass().addClass('hero is-fullheight is-aqi-very-unhealthy')
-            if(msg.label === "Hazardous")
-                $("#heroSection").removeClass().addClass('hero is-fullheight is-aqi-hazardous')
+        
+        
+        if(msg.name) $("#device-name").html(msg.name.toUpperCase())
+        $(".aqi-number").html(`<span class="aqi-number">${msg.aqi}<small class="aqi-type" id="aqi-type"> US AQI</small></span>`)
+        $(".aqi-status").html(msg.label)
+        $("#lastUpdate").text(moment(msg.ts).format("HH:mm"))
 
 
-        });
+        // PM2.5
+        if(msg.pm25) {
+          $(".pollutant").append(`<div class="item-container">
+            <div class="item">
+              <span class="item-type">PM2.5<small class="measure">  µg/m³</small></span>
+              <span class="item-value"><small class="aqi-circle green"></small>${msg.pm25}</span>
+            </div>
+          </div>`)
+        }
 
-        $("#slider-ctn").bind("change", function(e) {
-            defaultSpeedValue = e.target.value
-            socket.emit("command", { speed: defaultSpeedValue })
-        });
+        // CO2
+        if(msg.co2) {
+          $(".pollutant").append(`<div class="item-container">
+            <div class="item">
+              <span class="item-type">CO2<small class="measure">  ppm</small></span>
+              <span class="item-value"><small class="aqi-circle green"></small>${msg.co2}</span>
+            </div>
+          </div>`)
+        }
 
-        powerButton.on("click", function() {
-            socket.emit("command", { off: purifierStatus, on: !purifierStatus })
-            powerButton.css("color", purifierStatus ? 'red' : 'gray')
-        })
+        // Temperature
+        if(msg.temperature) {
+          $(".pollutant").append(`<div class="item-container">
+            <div class="item">
+              <span class="item-type">Temp.</span>
+              <span class="item-value"></small>${msg.temperature}°</span>
+            </div>
+          </div>`)
+        }
 
-        autoModeButton.on("click", function() {
-            socket.emit("command", { mode: purifierMode == 'auto' ? 'manual' : 'auto' })
-            autoModeButton.css("color", purifierMode == 'auto' ? 'green': 'gray')
-        })
-    </script>
+        // TVOC
+        if(msg.tvoc) {
+          $(".pollutant").append(`<div class="item-container">
+            <div class="item">
+              <span class="item-type">TVOC<small class="measure">  ppm</small></span>
+              <span class="item-value"><small class="aqi-circle ${msg.tvoc.color}"></small>${msg.tvoc.conc}</span>
+            </div>
+          </div>`)
+        }
 
-  </body>
+        // Humidity
+        if(msg.humidity) {
+          $(".pollutant").append(`<div class="item-container">
+            <div class="item">
+              <span class="item-type">Humid.</span>
+              <span class="item-value"></small>${msg.humidity}%</span>
+            </div>
+          </div>`)
+        }
+
+        // HCHO
+        if(msg.hcho) {
+          $(".pollutant").append(`<div class="item-container">
+            <div class="item">
+              <span class="item-type">HCHO<small class="measure">  ppm</small></span>
+              <span class="item-value"><small class="aqi-circle ${msg.hcho.color}"></small>${msg.hcho.conc}</span>
+            </div>
+          </div>`)
+        }
+
+        $(".pollutant").append('<div class="hide-border"></div>')
+    });
+  </script>
+</body>
+
 </html>

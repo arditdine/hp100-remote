@@ -11,8 +11,6 @@ const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017'
 
 app.use(express.static('assets'))
 app.get("/device", (req, res) =>  res.sendFile(__dirname + "/index.html"));
-app.get("/tv", (req, res) =>  res.sendFile(__dirname + "/tv.html"));
-app.get("/index.html", (req, res) => res.sendFile(__dirname + "/index.html"));
 
 const users = {};
 const DB_MODEL_MAP = { avp: 'device_info', avo: 'avo_device_info' }
@@ -22,7 +20,7 @@ io.on("connection", async(socket) => {
   
   if(!client) client = await MongoClient.connect(MONGO_URL, { useNewUrlParser: true });
 
-  // console.log(`Connected: ${model}_${device_id} ${socket.id}`)
+  console.log(`Connected: ${model}_${device_id} ${socket.id}`)
 
   users[`${model}_${device_id}`] = [...(users[`${model}_${device_id}`] || []), socket]
 
@@ -49,6 +47,8 @@ io.on("connection", async(socket) => {
 
   // When user disconnect we remove the socket from the users list
   socket.on("disconnect", () => {
+    console.log(`Discounnected: ${model}_${device_id} ${socket.id}`)
+    
     const disconnectedScoketIndex = users[`${model}_${device_id}`].findIndex(s => s.id === socket.id)
     _.pullAt(users[`${model}_${device_id}`], disconnectedScoketIndex)
   });
@@ -68,14 +68,22 @@ function emmit(model, { documentKey, operationType, updateDescription }) {
 
 function etlData(data = {}) {
   const res = {
-    aqius: _.get(data, 'current_measurement.aqius'),
-    tp: _.get(data, 'current_measurement.tp'),
-    hm: _.get(data, 'current_measurement.hm'),
+    name: _.get(data, 'settings.node_name'),
+    aqi: _.get(data, 'current_measurement.aqius'),
+    co2: _.get(data, 'current_measurement.co2'),
+    temperature: _.get(data, 'current_measurement.tp'),
+    humidity: _.get(data, 'current_measurement.hm'),
+    pm25: _.get(data, 'current_measurement.p2.conc') || _.get(data, 'current_measurement.pm25.conc'),
     ts: _.get(data, 'current_measurement.ts')
   }
 
   const p2 = _.get(data, 'current_measurement.p2') || _.get(data, 'current_measurement.pm25')
   if(p2) res.label = (aqiCalculator(p2.conc) || {}).label
+
+  const tvoc = _.get(data, 'current_measurement.voc')
+  if(tvoc) res.tvoc = {color: "maroon", conc: tvoc}
+  const hcho = _.get(data, 'current_measurement.hcho')
+  if(hcho) res.hcho = {color: "maroon", conc: hcho}
 
   return res;
 }
