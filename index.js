@@ -16,9 +16,10 @@ app.get("/", (req, res) =>  res.sendFile(__dirname + "/index.html"));
 app.get("/index.html", (req, res) => res.sendFile(__dirname + "/index.html"));
 
 const users = {};
+const cache = {};
 
 io.on("connection", async(socket) => {
-  // console.log("a user connected");
+  console.log("user connected: ", socket.id);
 
   // For Every new connection we get the Purifier Status
   io.sockets.emit('askPurifierStatus')
@@ -43,12 +44,15 @@ io.on("connection", async(socket) => {
 
   socket.on("disconnect", () => {
     delete users[socket.id]
+    console.log("user disconnected: ", socket.id);
   });
 });
 
 
 
 async function fetchData() {
+  if(cache && cache.timestamp && Date.now() - cache.timestamp < 1000 * 60) return cache.data
+
   try {
     const res = await request(AVP_URL).set({'x-api-token': USER_TOKEN}).retry(3).timeout(10000);
     const body = res.body || {};
@@ -68,6 +72,9 @@ async function fetchData() {
         data.label = label
       }
     })
+
+    cache.data = data
+    cache.timestamp = Date.now()
 
     return data;
   } catch (ex) {
