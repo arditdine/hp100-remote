@@ -19,7 +19,7 @@ const users = {};
 const cache = {};
 
 io.on("connection", async(socket) => {
-  console.log("user connected: ", socket.id);
+  console.log(`connected - ${socket.id} - ${socket.handshake.headers['user-agent']} - ${new Date().toISOString()}`);
 
   // For Every new connection we get the Purifier Status
   io.sockets.emit('askPurifierStatus')
@@ -44,7 +44,7 @@ io.on("connection", async(socket) => {
 
   socket.on("disconnect", () => {
     delete users[socket.id]
-    console.log("user disconnected: ", socket.id);
+    console.log(`disconnected - ${socket.id} - ${socket.handshake.headers['user-agent']} - ${new Date().toISOString()}`);
   });
 });
 
