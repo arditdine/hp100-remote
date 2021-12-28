@@ -289,7 +289,20 @@
         var purifierStatus = 0
         var defaultSpeedValue = 0
 
-        var socket = io();
+        var getQueryStringValue = function(parameter) {
+          var currentPageURL = window.location.search.substring(1);
+          var queryString = currentPageURL.split('&');
+          var getParameter;
+          var i;
+          for (i = 0; i < queryString.length; i++) {
+              getParameter = queryString[i].split('=');
+              if (getParameter[0] === parameter) {
+                  return getParameter[1] === undefined ? true : decodeURIComponent(getParameter[1]);
+              }
+          }
+        };
+
+        var socket = io({ query: { token: getQueryStringValue("token") } });
 
         socket.on('purfierStatus', function(data){
             var slider = $("#slider-ctn input");

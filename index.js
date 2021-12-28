@@ -8,6 +8,7 @@ const aqiCalculator = require('./lib')
 
 const AVP_URL = process.env.AVP_URL
 const USER_TOKEN = process.env.USER_TOKEN
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN
 const PORT = process.env.PORT || 8001
 
 app.use(express.static('assets'))
@@ -17,6 +18,16 @@ app.get("/index.html", (req, res) => res.sendFile(__dirname + "/index.html"));
 
 const users = {};
 const cache = {};
+
+io.use(async (socket, next) => {
+  const { token } = socket.handshake.query || {};
+  if(!token) return next(new Error('No token provided'))
+  // Check if provided token is same as the one in the env
+  // TODO: You can also use a database and verify if the provided
+  // token belongs to any user in the DB
+  if(token !== ACCESS_TOKEN) return next(new Error('Invalid token'))
+  next()
+})
 
 io.on("connection", async(socket) => {
   console.log(`connected - ${socket.id} - ${socket.handshake.headers['user-agent']} - ${new Date().toISOString()}`);
